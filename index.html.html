@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilingual Memory Recall Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        #title-screen, #game-container { margin-top: 20px; }
+        #game-container { display: none; }
+        #audio-container { margin-top: 20px; }
+        .word-box { width: 150px; padding: 5px; margin: 5px; text-align: center; }
+        #words-container { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        #submit-button { margin-top: 20px; padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <div id="title-screen">
+        <h1>Welcome to the Bilingual Memory Recall Game</h1>
+        <p><strong>Instructions:</strong></p>
+        <ul style="text-align: left; display: inline-block;">
+            <li>Select your native language and click "Start".</li>
+            <li>You will hear an audio recording **only once**.</li>
+            <li>Once the audio finishes, 32 input boxes will appear.</li>
+            <li>Type the words you remember in each box.</li>
+            <li>Click "Done" when you finish and take a screenshot of your answers.</li>
+        </ul>
+        <p><strong>Important:</strong> You can only listen to the audio once, and the input boxes will unlock only after the audio ends.</p>
+        <p>Select your native language to begin:</p>
+        <select id="language-select">
+            <option value="English">English</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Russian">Russian</option>
+            <option value="Vietnamese">Vietnamese</option>
+        </select>
+        <br><br>
+        <button onclick="startGame()">Start</button>
+    </div>
+
+    <div id="game-container">
+        <h2>Listen Carefully</h2>
+        <p>You can only listen to this once. After it finishes, type the 32 words you remember.</p>
+        <div id="audio-container">
+            <audio id="audio-player" controls></audio>
+        </div>
+
+        <div id="words-container"></div>
+
+        <button id="submit-button" onclick="submitWords()" disabled>Done</button>
+    </div>
+
+    <script>
+        let selectedLanguage = "";
+        let audioPlayed = false;
+        let audioFiles = {
+            "English": "English.mp3",
+            "Chinese": "Chinese.mp3",
+            "Russian": "Russian.mp3",
+            "Vietnamese": "Vietnamese.mp3"
+        };
+
+        function startGame() {
+            selectedLanguage = document.getElementById("language-select").value;
+            document.getElementById("title-screen").style.display = "none";
+            document.getElementById("game-container").style.display = "block";
+            let audioPlayer = document.getElementById("audio-player");
+            audioPlayer.src = audioFiles[selectedLanguage];
+            audioPlayer.play();
+
+            // Disable ability to replay audio
+            audioPlayer.onended = function() {
+                audioPlayer.controls = false;
+                audioPlayer.pause();
+                audioPlayed = true;
+                enableInputs();
+            };
+
+            // Disable play button after first interaction
+            audioPlayer.onplay = function() {
+                if (audioPlayed) {
+                    audioPlayer.pause();
+                }
+                audioPlayed = true;
+            };
+
+            let wordsContainer = document.getElementById("words-container");
+            wordsContainer.innerHTML = ""; // Clear any previous inputs
+
+            // Create 32 input boxes but disable them initially
+            for (let i = 1; i <= 32; i++) {
+                let inputBox = document.createElement("input");
+                inputBox.type = "text";
+                inputBox.className = "word-box";
+                inputBox.placeholder = "Word " + i;
+                inputBox.disabled = true; // Initially disabled
+                wordsContainer.appendChild(inputBox);
+            }
+        }
+
+        function enableInputs() {
+            let inputs = document.querySelectorAll(".word-box");
+            inputs.forEach(input => input.disabled = false);
+            document.getElementById("submit-button").disabled = false;
+        }
+
+        function submitWords() {
+            alert("Please take a screenshot of your answers before closing this page.");
+        }
+    </script>
+
+</body>
+</html>
